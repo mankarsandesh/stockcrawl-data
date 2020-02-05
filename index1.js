@@ -18,24 +18,21 @@ app.get('/home', function (req,res) {
 
 async function stockData() {       
     requestPromise(stockUrl, {json: true })
-    .then(function(res){      
-        
-             
-        
-        console.log(res);
+    .then(function(res){ 
+      
         var newData = res.replace("/*<script>location.href='//sina.com';</script>*/",'');
         var data = newData.replace("var _sh000001_5_1553569576264=(",'');
         var FinalData = data.replace(");",'');
 
         arrayData = [];   
         console.log("start");
+        //  Sting convert to JSON
         let finalStock = JSON.parse(FinalData); 
 
         console.log(finalStock);
-        // // Sting convert to JSON
-        // let finalStock = JSON.parse(newData); 
-        // console.log(finalStock);
-        // // Count Json Object Data
+      
+      
+        // Count Json Object Data
         var count= Object.keys(finalStock).length;
         
         // For Loop for create new Response
@@ -50,7 +47,7 @@ async function stockData() {
             // all object data will store in arrayData 
             arrayData.push(obj);           
         }
-        // // array will be reverse and latest data will be first
+        // array will be reverse and latest data will be first
         stockReverse = arrayData.reverse();    
         // stockReverse array store in stock data array    
         stock = stockReverse;  

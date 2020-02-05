@@ -7,16 +7,17 @@ const {successResponse, errorHandler,notFoundError,badRequestError} = require('.
 const mio = require('./socket');
 app.use(bodyParser.urlencoded({extended: true}));
 
-let stock ={};
+let stock ={}; 
 
-
-let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=140";
 
 app.get('/home', function (req,res) {
     return res.send(successResponse(stock,"sh000001"));
 });
 
-async function stockData() {       
+async function stockData() { 
+        
+    let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=140";
+
     requestPromise(stockUrl, {json: true })
     .then(function(res){      
         
@@ -62,12 +63,8 @@ const server = app.listen(port, () => {
     io.on('connection', socket => {
         console.log('client connected')
     })
-
-
-    setInterval(function(str1, str2) {
-        
+    setInterval(function(str1, str2) {        
         mio.getIO().emit('stock', stock)
-        
     }, 1000);
 
     console.log(`Server is up on port ${port}`);
