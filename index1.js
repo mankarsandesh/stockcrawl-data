@@ -10,25 +10,32 @@ app.use(bodyParser.urlencoded({extended: true}));
 let stock ={};
 
 
-let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=140";
+let stockUrl = "https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20_sh000001_5_1553569576264=/CN_MarketDataService.getKLineData?symbol=sh000300&scale=5&ma=no&datalen=2";
 
 app.get('/home', function (req,res) {
-    return res.send(successResponse(stock,"sh000001"));
+    return res.send(successResponse(stock,"sh000300"));
 });
 
 async function stockData() {       
     requestPromise(stockUrl, {json: true })
     .then(function(res){      
         
-        // replace all string object
-        var data = res.replace(/{day:/g,'{"day":').replace(/,open:/g,',"open":').replace(/,high:/g,',"high":').replace(/,low:/g,',"low":').replace(/,close:/g,',"close":').replace(/,volume:/g,',"volume":');
-
-        arrayData = [];     
+             
         
-        // Sting convert to JSON
-        let finalStock = JSON.parse(data); 
-        // Count Json Object Data
-        console.log(typeof finalStock);
+        console.log(res);
+        var newData = res.replace("/*<script>location.href='//sina.com';</script>*/",'');
+        var data = newData.replace("var _sh000001_5_1553569576264=(",'');
+        var FinalData = data.replace(");",'');
+
+        arrayData = [];   
+        console.log("start");
+        let finalStock = JSON.parse(FinalData); 
+
+        console.log(finalStock);
+        // // Sting convert to JSON
+        // let finalStock = JSON.parse(newData); 
+        // console.log(finalStock);
+        // // Count Json Object Data
         var count= Object.keys(finalStock).length;
         
         // For Loop for create new Response
@@ -43,7 +50,7 @@ async function stockData() {
             // all object data will store in arrayData 
             arrayData.push(obj);           
         }
-        // array will be reverse and latest data will be first
+        // // array will be reverse and latest data will be first
         stockReverse = arrayData.reverse();    
         // stockReverse array store in stock data array    
         stock = stockReverse;  
@@ -52,7 +59,9 @@ async function stockData() {
     .catch(function(err) {
         // Crawling failed...
         console.log(err)
-    });   
+    });
+
+    
 }
 
 const server = app.listen(port, () => {
