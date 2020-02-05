@@ -3,17 +3,14 @@ const app = express();
 const requestPromise = require('request-promise');
 const request = require('request');
 const bodyParser = require('body-parser');
-const port = process.env.PORT || 5002;
+const port = process.env.PORT || 5004;
 
 const https = require('https');
 // const http = require('http');
 const mio = require('./socket');
 app.use(bodyParser.urlencoded({extended: true}));
 
-let stock = {
-    data: {
-    }
-}
+let stock ={};
 let stockData1 = {}
 
 let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=3";
@@ -26,18 +23,26 @@ async function stockData() {
     requestPromise(stockUrl, {json: true })
     .then(function(res){
         // const data = JSON.parse(res.toString());
-        console.log(res);   
-        var data = res.replace("volume:",'"volume":');
-        // var data1 = data.replace(",open:", ',"open":');
-        // var data2 = data1.replace(",high:", ',"high":');
-        // var data3 = data2.replace(",low:", ',"low":');
-        // var data4 = data3.replace(",close:", ',"close":');
-        // var data5 = data4.replace(",volume:", ',"volume":');  
-        // var b = JSON.parse(data); 
-    
+       
+        var data = res.replace(/{day:/g,'{"day":').replace(/,open:/g,',"open":').replace(/,high:/g,',"high":').replace(/,low:/g,',"low":').replace(/,close:/g,',"close":').replace(/,volume:/g,',"volume":');
+
+        arrayData = [];     
         
-        console.log(data);     
-        // stock.data = data;       
+        let finalStock = JSON.parse(data); 
+        var count= Object.keys(finalStock).length;
+        console.log(finalStock[0]);   
+        const StockData = {}
+        for (i = 0; i < count; i++) {
+            var obj = {};
+           
+
+            obj['date'] = finalStock[i].day;
+            obj['open']  = finalStock[i].open;       
+            arrayData.push(obj);           
+        }
+        console.log(arrayData.reverse());     
+        // stock.data = StockData;  
+       
     })
     .catch(function(err) {
         // Crawling failed...
