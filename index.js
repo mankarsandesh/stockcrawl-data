@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 5002;
 
 const https = require('https');
-const http = require('http');
+// const http = require('http');
 const mio = require('./socket');
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -16,26 +16,35 @@ let stock = {
 }
 let stockData1 = {}
 
-let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=1";
+let stockUrl = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh000001&scale=5&ma=no&datalen=3";
 app.get('/home', function (req, res) {
     res.status(200).json(stock)   
 });
 let options = {json: true};
 
-function stockData() {
-    setInterval(() => {
-        requestPromise(stockUrl, {json: true })
-        .then(function(htmlString) {
-          const rs = htmlString.toString().split(",");
-          console.log(rs[0]);      
-        })
-        .catch(function(err) {
-            console.log(err)
-        });
+async function stockData() {       
+    requestPromise(stockUrl, {json: true })
+    .then(function(res){
+        // const data = JSON.parse(res.toString());
+        console.log(res);   
+        var data = res.replace("volume:",'"volume":');
+        // var data1 = data.replace(",open:", ',"open":');
+        // var data2 = data1.replace(",high:", ',"high":');
+        // var data3 = data2.replace(",low:", ',"low":');
+        // var data4 = data3.replace(",close:", ',"close":');
+        // var data5 = data4.replace(",volume:", ',"volume":');  
+        // var b = JSON.parse(data); 
+    
+        
+        console.log(data);     
+        // stock.data = data;       
+    })
+    .catch(function(err) {
+        // Crawling failed...
+        console.log(err)
+    });
 
-       
-
-    },1000)
+    
 }
 
 const server = app.listen(port, () => {
